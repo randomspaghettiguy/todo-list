@@ -31,6 +31,17 @@ type Collection interface {
 	UpdateMany(context.Context, interface{}, interface{}, ...*options.UpdateOptions) (*mongo.UpdateResult, error)
 }
 
+type SingleResult interface {
+	Decode(interface{}) error
+}
+
+type Cursor interface {
+	Close(context.Context) error
+	Next(context.Context) bool
+	Decode(interface{}) error
+	All(context.Context, interface{}) error
+}
+
 type Client interface {
 	Database(string) Database
 	Connect(context.Context) error
@@ -84,6 +95,7 @@ func (d *nullawareDecoder) DecodeValue(dctx bsoncodec.DecodeContext, vr bsonrw.V
 }
 
 func NewClient(connection string) (Client, error) {
+
 	time.Local = time.UTC
 	c, err := mongo.NewClient(options.Client().ApplyURI(connection))
 
