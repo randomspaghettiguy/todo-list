@@ -63,3 +63,39 @@ func (tr *toDoItemRepository) GetByID(c context.Context, id string) (domain.ToDo
 	err = collection.FindOne(c, bson.M{"_id": idHex}).Decode(&item)
 	return item, err
 }
+
+func (tr *toDoItemRepository) Delete(c context.Context, id string) error {
+	collection := tr.database.Collection(tr.collection)
+
+	idHex, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	_, err = collection.DeleteOne(c, bson.M{"_id": idHex})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (tr *toDoItemRepository) Edit(c context.Context, id string, status bool) error {
+	collection := tr.database.Collection(tr.collection)
+
+	idHex, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	opts := options.Update().SetUpsert(true)
+	filter := bson.D{{"_id", idHex}}
+	update := bson.D{{"$set", bson.D{{"status", status}}}}
+
+	_, err = collection.UpdateOne(c, filter, update, opts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

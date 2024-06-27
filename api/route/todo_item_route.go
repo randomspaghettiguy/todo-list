@@ -20,4 +20,6 @@ func NewToDoItemRoute(env *bootstrap.Env, timeout time.Duration, db mongo.Databa
 	group.POST("/task", tc.Create)
 	group.GET("/tasks", tc.Fetch)
 	group.GET("/read", tc.GetByID)
+	group.DELETE("/delete", tc.Delete)
+	group.PUT("/edit", tc.Edit)
 }

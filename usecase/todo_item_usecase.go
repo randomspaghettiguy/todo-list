@@ -36,3 +36,15 @@ func (tu *ToDoItemUseCase) GetByID(c context.Context, id string) (domain.ToDoIte
 	defer cancel()
 	return tu.toDoItemRepository.GetByID(ctx, id)
 }
+
+func (tu *ToDoItemUseCase) Delete(c context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
+	defer cancel()
+	return tu.toDoItemRepository.Delete(ctx, id)
+}
+
+func (tu *ToDoItemUseCase) Edit(c context.Context, id string, status bool) error {
+	ctx, cancel := context.WithTimeout(c, tu.contextTimeout)
+	defer cancel()
+	return tu.toDoItemRepository.Edit(ctx, id, status)
+}

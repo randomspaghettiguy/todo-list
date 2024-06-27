@@ -56,7 +56,7 @@ func (tc *ToDoItemController) Fetch(c *gin.Context) {
 }
 
 func (tc *ToDoItemController) GetByID(c *gin.Context) {
-	taskId := c.GetString("x-task-id")
+	taskId := c.Query("x-task-id")
 
 	task, err := tc.ToDoItemUseCase.GetByID(c, taskId)
 	if err != nil {
@@ -65,4 +65,39 @@ func (tc *ToDoItemController) GetByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, task)
+}
+
+func (tc *ToDoItemController) Delete(c *gin.Context) {
+	taskId := c.Query("x-task-id")
+
+	err := tc.ToDoItemUseCase.Delete(c, taskId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.SuccessResponse{
+		Message: "Deleted item successfully!",
+	})
+}
+
+func (tc *ToDoItemController) Edit(c *gin.Context) {
+	rq := domain.EditTaskRequset{Status: false}
+	taskId := c.Query("x-task-id")
+
+	err := c.ShouldBind(&rq)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	err = tc.ToDoItemUseCase.Edit(c, taskId, rq.Status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.SuccessResponse{
+		Message: "Editted item successfully!",
+	})
 }
